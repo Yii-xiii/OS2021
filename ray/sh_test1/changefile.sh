@@ -8,7 +8,7 @@ do
 
 	elif [ $a -gt 40 ]         # else if loop variable is great than 40   
 	then
-		mv -r file$a newfile$a
+		mv file$a newfile$a
 	fi
 	
 	#don't forget change the loop variable
