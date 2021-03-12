@@ -6,5 +6,3 @@ main:
 
 clean: 
 	$(MAKE) --directory=code clean;
-	rm fibo
-	
