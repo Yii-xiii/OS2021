@@ -17,7 +17,12 @@ SECTIONS
   tips: maybe you can find the answer in include/ .
 	look for the memory map.
 */
-
+. = 0x00000000;
+.text : { *(.text) };
+. = 0x00000bd0;
+.data : { *(.data) };
+. = 0x00008bd0;
+.bss : { *(.bss) };
 
 end = . ;
 }
