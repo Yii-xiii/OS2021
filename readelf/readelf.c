@@ -71,6 +71,7 @@ int readelf(u_char *binary, int size)
         // hint: section number starts at 0.
 	for (Nr = 0; Nr < sh_entry_count; Nr++) {
 		printf("%d:0x%x\n",Nr,shdr + Nr*sh_entry_size);
+		shdr++;
 	}
 
 
