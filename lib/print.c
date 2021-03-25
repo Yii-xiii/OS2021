@@ -181,13 +181,15 @@ lp_Print(void (*output)(void *, char *, int),
 					OUTPUT(arg,&padc,1);
 					width--;
 				}
+				OUTPUT(arg,buf,length);
 			} else {
 				while(width>length) {
 					OUTPUT(arg," ",1);
 					width--;
 				}
+				OUTPUT(arg,buf,length);
 			}
-			OUTPUT(arg,buf,length);
+			//OUTPUT(arg,buf,length);
 		}		
 			
 	    	//length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
