@@ -111,7 +111,7 @@ lp_Print(void (*output)(void *, char *, int),
 			fmt++;
 		}
 	} else {
-		width = 1;
+		width = 0;
 	}
 	if (*fmt == '.') {
 		fmt++;
