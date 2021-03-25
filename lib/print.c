@@ -71,6 +71,14 @@ lp_Print(void (*output)(void *, char *, int),
 	    /* flush the string found so far */
 
 	    /* check "are we hitting the end?" */
+	if (*fmt == '\0') {
+		break;
+	}
+	if (*fmt != '%') {
+	  	OUTPUT(arg, fmt, 1);
+	   	fmt ++;
+	   	continue;
+	}
 	}
 
 	
@@ -81,8 +89,38 @@ lp_Print(void (*output)(void *, char *, int),
 	/* check for other prefixes */
 
 	/* check format flag */
+	fmt++;
+	if (*fmt == '0') {
+		padc = '0';
+		ladjust = 0;
+		fmt++;
+	} else if (*fmt == '-') {
+		ladjust = 1;
+	} else {
+		ladjust = 0;
+	}
+	if (IsDigit(*fmt)) {
+		width = 0;
+		while (IsDigit(*fmt)) {
+			width = width * 10 + *fmt - '0';
+			fmt++;
+		}
+	} else {
+		width = 1;
+	}
+	if (*fmt == '.') {
+		fmt++;
+		prec = 0;
+		while (IsDigit(*fmt)) {
+			prec = prec * 10 + *fmt - '0';
+			fmt++;
+		}
+	}
+	if (*fmt == 'l') {
+		longFlag = 1;
+		fmt++;
+	}
 	
-
 	negFlag = 0;
 	switch (*fmt) {
 	 case 'b':
