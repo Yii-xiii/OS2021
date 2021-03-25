@@ -113,7 +113,7 @@ lp_Print(void (*output)(void *, char *, int),
 	} else {
 		width = 0;
 	}
-	prec = 0;
+	prec = -1;
 	if (*fmt == '.') {
 		fmt++;
 		prec = 0;
@@ -157,6 +157,9 @@ lp_Print(void (*output)(void *, char *, int),
 		if (num <0) {
 			negFlag=1;
 			num*=1;
+			if (prec == -1) {
+				prec = width-1;
+			}
 		}
 		if (negFlag) {
 			length = PrintNum(buf,num,10,negFlag,prec+1,ladjust,'0',0);
@@ -166,9 +169,17 @@ lp_Print(void (*output)(void *, char *, int),
 		if (length>=width) {
 			OUTPUT(arg,buf,length);
 		} else {
-			while(width>length) {
-				OUTPUT(arg," ",length);
-				width--;
+			if (prec!=-1) {
+				while(width>length) {
+					OUTPUT(arg,padc,1);
+					width--;
+				}
+			}
+			else {
+				while(width>length) {
+					OUTPUT(arg," ",1);
+					width--;
+				}
 			}
 			OUTPUT(arg,buf,length);
 		}		
