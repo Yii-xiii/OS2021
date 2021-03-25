@@ -156,7 +156,7 @@ lp_Print(void (*output)(void *, char *, int),
 		*/
 		if (num <0) {
 			negFlag=1;
-			num*=1;
+			num*=-1;
 			if (prec == -1) {
 				prec = width-1;
 			}
