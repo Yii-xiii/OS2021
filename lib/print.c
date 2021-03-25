@@ -157,10 +157,12 @@ lp_Print(void (*output)(void *, char *, int),
 		if (num <0) {
 			negFlag=1;
 			num*=-1;
+			if (prec == -1) {
+				prec=width-1;
+			}
 		}
 		if (negFlag) {
 			length = PrintNum(buf,num,10,negFlag,prec+1,ladjust,'0',0);
-			prec = length;
 		} else {
 			length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
 		}
