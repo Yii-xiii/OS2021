@@ -158,12 +158,27 @@ lp_Print(void (*output)(void *, char *, int),
 			negFlag=1;
 			num*=1;
 		}
-	    	length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
-		while(width>length) {
-		OUTPUT(arg,padc,1);
-		width--;
+		if (negFlag) {
+			length = PrintNum(buf,num,10,negFlag,prec+1,ladjust,'0',0);
+		} else {
+			length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
 		}
-	    	OUTPUT(arg,buf,length);
+		if (length>=width) {
+			OUTPUT(arg,buf,length);
+		} else {
+			while(width>length) {
+				OUTPUT(arg," ",length);
+				width--;
+			}
+			OUTPUT(arg,buf,length);
+		}		
+			
+	    	//length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
+		//while(width>length) {
+		//OUTPUT(arg,padc,1);
+		//width--;
+		//}
+		//length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
 		break;
 
 	 case 'o':
