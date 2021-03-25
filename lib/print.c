@@ -113,6 +113,7 @@ lp_Print(void (*output)(void *, char *, int),
 	} else {
 		width = 0;
 	}
+	prec = 0;
 	if (*fmt == '.') {
 		fmt++;
 		prec = 0;
@@ -120,12 +121,6 @@ lp_Print(void (*output)(void *, char *, int),
 			prec = prec * 10 + *fmt - '0';
 			fmt++;
 		}
-		if (width < prec) {
-			width = prec;
-
-		} 
-	} else {
-		prec = width;
 	}
 	if (*fmt == 'l') {
 		longFlag = 1;
@@ -165,7 +160,7 @@ lp_Print(void (*output)(void *, char *, int),
 		}
 	    	length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
 		while(width>length) {
-		OUTPUT(arg," ",1);
+		OUTPUT(arg,padc,1);
 		width--;
 		}
 	    	OUTPUT(arg,buf,length);
