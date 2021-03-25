@@ -153,7 +153,7 @@ lp_Print(void (*output)(void *, char *, int),
 			your code here.
 			Refer to other part (case 'b',case 'o' etc.) and func PrintNum to complete this part.
 			Think the difference between case 'd' and others. (hint: negFlag).
-		*/
+	*/
 		if (num <0) {
 			negFlag=1;
 			num*=-1;	
@@ -172,7 +172,7 @@ lp_Print(void (*output)(void *, char *, int),
 		} else {
 			if (!negFlag) {
 				while(width>length) {
-					OUTPUT(arg,padc,1);
+					OUTPUT(arg,&padc,1);
 					width--;
 				}
 			}
