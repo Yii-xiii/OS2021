@@ -90,15 +90,20 @@ lp_Print(void (*output)(void *, char *, int),
 
 	/* check format flag */
 	fmt++;
-	if (*fmt == '0') {
-		padc = '0';
-		ladjust = 0;
-		fmt++;
-	} else if (*fmt == '-') {
-		ladjust = 1;
-	} else {
-		ladjust = 0;
-	}
+	padc = ' ';
+	ladjust = 0;
+	while (*fmt == '0' || *fmt == '-'){
+		if (*fmt == '0') {
+			padc = '0';
+			fmt++;
+			continue;
+		}
+		if (*fmt == '-') {
+			ladjust = 1;
+			fmt++;
+		}
+	}	
+
 	if (IsDigit(*fmt)) {
 		width = 0;
 		while (IsDigit(*fmt)) {
