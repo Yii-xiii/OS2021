@@ -122,9 +122,8 @@ lp_Print(void (*output)(void *, char *, int),
 		}
 		if (width < prec) {
 			width = prec;
-			padc = '0';
+
 		} 
-		padc = '0';
 	} else {
 		prec = width;
 	}
@@ -164,7 +163,11 @@ lp_Print(void (*output)(void *, char *, int),
 			negFlag=1;
 			num*=1;
 		}
-	    	length = PrintNum(buf,num,10,negFlag,width,ladjust,padc,0);
+	    	length = PrintNum(buf,num,10,negFlag,prec,ladjust,'0',0);
+		while(width>length) {
+		OUTPUT(arg," ",1);
+		width--;
+		}
 	    	OUTPUT(arg,buf,length);
 		break;
 
