@@ -217,7 +217,7 @@ page_alloc(struct Page **pp)
     struct Page *ppage_temp;
 
     /* Step 1: Get a page from free memory. If fails, return the error code.*/
-	if (LIST_FIRST(&page_free_list) == null) {
+	if (LIST_EMPTY(&page_free_list)) {
 		return E_NO_MEM;
 	} else {
 		ppage_temp = LIST_FIRST(&page_free_list);
