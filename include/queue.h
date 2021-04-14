@@ -110,12 +110,12 @@
  */
 #define LIST_INSERT_AFTER(listelm, elm, field) do {						\
 		LIST_NEXT((elm),field) = LIST_NEXT((listelm),field);				\
-		if (LIST_NEXT((listelm),field) !=  null) {					\
-			LIST_NEXT((listelm),field)->field.le_prev = &LIST_NEXT((elm),field);	\
+		if (LIST_NEXT((listelm),field) !=  NULL) {					\
+			(LIST_NEXT((listelm),field))->field.le_prev = &LIST_NEXT((elm),field);	\
 		}										\
 		LIST_NEXT((listelm),field) = (elm);						\
-		elm->field.le_prev = &LIST_NEXT((listelm),field);				\
-	} while(0)										\
+		(elm)->field.le_prev = &LIST_NEXT((listelm),field);				\
+	} while(0)										
         // Note: assign a to b <==> a = b
         //Step 1, assign elm.next to listelem.next.
         //Step 2: Judge whether listelm.next is NULL, if not, then assign listelm.pre to a proper value.
@@ -150,12 +150,18 @@
  * Insert the element "elm" at the tail of the list named "head".
  * The "field" name is the link element as above. You can refer to LIST_INSERT_HEAD.
  * Note: this function has big differences with LIST_INSERT_HEAD !
- */
+ */ 
 #define LIST_INSERT_TAIL(head, elm, field) do {					\
-		LIST_NEXT((elm),field) = LIST_NEXT((listelm),field);		\
-		LIST_NEXT((listelm),field) = (elm);				\
-		(elm)->field.le_prev = &LIST_NEXT((listelm),field);		\
-	} while(0)								\
+		typeof(elm) temp_elm = LIST_FIRST(head);			\
+		if (temp_elm == NULL) {						\
+			LIST_INSERT_HEAD(head,elm,field);			\
+			break;							\
+		}								\
+		while (LIST_NEXT(temp_elm,field) != NULL) {			\
+			temp_elm = LIST_NEXT(temp_elm,field);			\
+		}								\				
+		LIST_INSERT_AFTER(temp_elm,elm,field);				\
+	} while(0)								
 /* finish your code here. */
 
 

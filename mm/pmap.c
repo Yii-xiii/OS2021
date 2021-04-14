@@ -189,12 +189,14 @@ page_init(void)
 	for (i = 0; i < PADDR(freemem) >> 12 ; i++) {
 		pages[i].pp_ref = 1;
 	}
+	
 
     /* Step 4: Mark the other memory as free. */
 	for (;i < npage; i++ ) {
 		pages[i].pp_ref = 0;
 		LIST_INSERT_HEAD(&page_free_list,&pages[i],pp_link);
 	}
+	
 }
 
 /*Overview:
@@ -214,11 +216,12 @@ page_init(void)
 int
 page_alloc(struct Page **pp)
 {
+
     struct Page *ppage_temp;
 
     /* Step 1: Get a page from free memory. If fails, return the error code.*/
 	if (LIST_EMPTY(&page_free_list)) {
-		return E_NO_MEM;
+		return -E_NO_MEM;
 	} else {
 		ppage_temp = LIST_FIRST(&page_free_list);
 		LIST_REMOVE(ppage_temp, pp_link);
@@ -230,7 +233,7 @@ page_alloc(struct Page **pp)
 	
 	*pp = ppage_temp;
 	return 0;
-
+	
 }
 
 /*Overview:
@@ -481,6 +484,19 @@ physical_memory_manage_check(void)
 		//test_pages[i].pp_link=NULL;
 		//printf("0x%x  0x%x\n",&test_pages[i], test_pages[i].pp_link.le_next);
 		LIST_INSERT_TAIL(&test_free,&test_pages[i],pp_link);
+		
+		/*do {					
+		typeof(&test_pages[i]) listelm = LIST_FIRST((&test_free));			
+		if (listelm == NULL) {						
+			LIST_INSERT_HEAD((&test_free),(&test_pages[i]),(pp_link));			
+			break;							
+		}								
+		while (LIST_NEXT(listelm,(pp_link)) != NULL) {			
+			listelm = LIST_NEXT(listelm,(pp_link));			
+		}								
+		LIST_INSERT_AFTER(listelm,&test_pages[i],pp_link);				
+		} while(0);								
+		*/
 		//printf("0x%x  0x%x\n",&test_pages[i], test_pages[i].pp_link.le_next);
 
 	}
