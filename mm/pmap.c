@@ -130,11 +130,14 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
     Pte *pgtable_entry;
 
     /* Step 1: Check if `size` is a multiple of BY2PG. */
-
+	size = ROUND(size, BY2PG);
 
     /* Step 2: Map virtual address space to physical address. */
     /* Hint: Use `boot_pgdir_walk` to get the page table entry of virtual address `va`. */
-
+	for (i = 0; i < size ; i +=BY2PG) {
+		va_temp = va + i;
+		pgtable_entry = boot_pgdir_walk(pgdir, va_temp, 1);
+		*pgtable_entry = PTE_ADDR(pa + i) | (perm | PTE_V);
 
 }
 
