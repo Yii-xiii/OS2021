@@ -110,7 +110,7 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
 	}
 
     /* Step 3: Get the page table entry for `va`, and return it. */
-	pgtable = KADDR(PTE_ADDR(*pgdir_entrp));
+	pgtable = KADDR(PTE_ADDR(*pgdir_entryp));
 	pgtable_entry = pgtable + PTX(va);
 	return pgtable_entry;
 
@@ -138,7 +138,7 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
 		va_temp = va + i;
 		pgtable_entry = boot_pgdir_walk(pgdir, va_temp, 1);
 		*pgtable_entry = PTE_ADDR(pa + i) | (perm | PTE_V);
-
+	}
 }
 
 /* Overview:
@@ -361,7 +361,7 @@ page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm)
     /* Step 3: Do check, re-get page table entry to validate the insertion. */
 		
     /* Step 3.1 Check if the page can be insert, if can’t return -E_NO_MEM */
-	if (pgdir_walk(pgdir,va,1,&pgatble_entry) != 0) {
+	if (pgdir_walk(pgdir,va,1,&pgtable_entry) != 0) {
 		return -E_NO_MEM;
 	}		
 
