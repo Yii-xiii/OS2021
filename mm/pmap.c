@@ -101,10 +101,10 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
      * table. */
 	if (!(*pgdir_entryp & PTE_V) && create) {
 		*pgdir_entryp = PADDR(alloc(BY2PG,BY2PG,1));
-		if (pgdir_entryp == -E_NO_MEM) {
-			return -E_NO_MEM;
-		}
-		*pgdir_entryp = *pgdir_entryp | PTE_V | PTE_R;
+		//if (pgdir_entryp == -E_NO_MEM) {
+		//	return -E_NO_MEM;
+		//}
+		*pgdir_entryp = (*pgdir_entryp) | PTE_V | PTE_R;
 	} else if (!pgdir_entryp & PTE_V) {
 		return 0;
 	}
@@ -161,7 +161,6 @@ void mips_vm_init()
     mCONTEXT = (int)pgdir;
 
     boot_pgdir = pgdir;
-
     /* Step 2: Allocate proper size of physical memory for global array `pages`,
      * for physical memory management. Then, map virtual address `UPAGES` to
      * physical address `pages` allocated before. For consideration of alignment,
@@ -206,8 +205,8 @@ page_init(void)
 
     /* Step 4: Mark the other memory as free. */
 	for (;i < npage; i++ ) {
-		pages[i].pp_ref = 0;
 		LIST_INSERT_HEAD(&page_free_list,&pages[i],pp_link);
+		pages[i].pp_ref = 0;
 	}
 	
 }
