@@ -105,7 +105,7 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
 		//	return -E_NO_MEM;
 		//}
 		*pgdir_entryp = (*pgdir_entryp) | PTE_V | PTE_R;
-	} else if (!pgdir_entryp & PTE_V) {
+	} else if (!(*pgdir_entryp & PTE_V)) {
 		return 0;
 	}
 
