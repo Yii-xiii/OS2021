@@ -60,7 +60,12 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
     struct Env *e;
     /* Hint: If envid is zero, return curenv.*/
     /*Step 1: Assign value to e using envid. */
-
+	if (envid == 0) {
+		*penv = curenv;
+		return 0;
+	} else {
+		e = envs + ENVX(envid);
+	}
 
 
     if (e->env_status == ENV_FREE || e->env_id != envid) {
@@ -76,8 +81,10 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
      *     If not, error! */
     /*     Step 2: Make a check according to checkperm. */
 
-
-
+	if (checkperm && e->env_id != curenv->env_id && e->env_parent_id != curenv->env_id) {
+		*penv = 0;
+		return -E_BAD_ENV;
+	}
 
     *penv = e;
     return 0;
@@ -97,14 +104,17 @@ env_init(void)
 {
     int i;
     /*Step 1: Initial env_free_list. */
-
+	LIST_INIT(&env_free_list);
 
     /*Step 2: Traverse the elements of 'envs' array,
      * set their status as free and insert them into the env_free_list.
      * Choose the correct loop order to finish the insertion.
      * Make sure, after the insertion, the order of envs in the list
      * should be the same as it in the envs array. */
-
+	for (i = NENV - 1; i >= 0; i--) {
+		envs[i].env_status = ENV_FREE;
+		LIST_INSERT_HEAD(&env_free_list,&envs[i],env_link);
+	}
 
 }
 
