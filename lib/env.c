@@ -279,11 +279,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     }
     return 0;
 }
-/* Overview:
- *  Sets up the the initial stack and program binary for a user process.
-    }
-    return 0;
-}
+
 /* Overview:
  *  Sets up the the initial stack and program binary for a user process.
  *  This function loads the complete binary image by using elf loader,
@@ -312,14 +308,14 @@ load_icode(struct Env *e, u_char *binary, u_int size)
     u_long perm;
 
     /*Step 1: alloc a page. */
-
+	page_alloc(&p);
 
     /*Step 2: Use appropriate perm to set initial stack for new Env. */
     /*Hint: Should the user-stack be writable? */
-
+	page_insert((e->env_pgdir), p, USTACKTOP - BY2PG, PTE_R);
 
     /*Step 3:load the binary using elf loader. */
-
+	load_elf(binary, size, &entry_point, e, load_icode_mapper);
 
     /*Step 4:Set CPU's PC register as appropriate value. */
     e->env_tf.pc = entry_point;
@@ -340,15 +336,18 @@ env_create_priority(u_char *binary, int size, int priority)
 {
         struct Env *e;
     /*Step 1: Use env_alloc to alloc a new env. */
+	env_alloc(&e,0);
 
     /*Step 2: assign priority to the new env. */
+	e->env_pri = priority;
 
     /*Step 3: Use load_icode() to load the named elf binary,
       and insert it into env_sched_list using LIST_INSERT_HEAD. */
-
+	load_icode(e, binary, size);
+	LIST_INSERT_HEAD(env_sched_list, e, env_link);
 }
-/* Overview:
- * Allocates a new env with default priority value.
+
+/* Allocates a new env with default priority value.
  *
  * Hints:
  *  this function calls the env_create_priority function.
@@ -359,6 +358,7 @@ env_create(u_char *binary, int size)
 {
      /*Step 1: Use env_create_priority to alloc a new env with priority 1 */
 
+	env_create_priority(binary, size, 1);
 }
 
 /* Overview:
@@ -440,13 +440,17 @@ env_run(struct Env *e)
     /*Step 1: save register state of curenv. */
     /* Hint: if there is an environment running, you should do
     *  switch the context and save the registers. You can imitate env_destroy() 's behaviors.*/
-
+	if (curenv != NULL) {
+		struct Trapframe *old = (struct Trapframe *) (TIMESTACK - sizeof(struct Trapframe));
+		bcopy(old, &(curenv->env_tf), sizeof(struct Trapframe));
+		curenv->env_tf.pc = curenv->env_tf.cp0_epc;
+	}
 
     /*Step 2: Set 'curenv' to the new environment. */
-
+	curenv = e;
 
     /*Step 3: Use lcontext() to switch to its address space. */
-
+	lcontext(e->env_pgdir);
 
     /*Step 4: Use env_pop_tf() to restore the environment's
      * environment   registers and return to user mode.
@@ -454,7 +458,7 @@ env_run(struct Env *e)
      * Hint: You should use GET_ENV_ASID there. Think why?
      * (read <see mips run linux>, page 135-144)
      */
-
+	env_pop_tf(&(e->env_tf), GET_ENV_ASID(e->env_id));
 }
 void env_check()
 {

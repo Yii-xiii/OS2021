@@ -5,8 +5,7 @@ SECTIONS
 {
   . = 0x80010000;
   
-  /*** exercise 3.12 ***/
-  
+  /*** exercise 3.12 ***/  
   .text : {
         *(.text)
     }
@@ -22,6 +21,10 @@ SECTIONS
   .sdata : {
     *(.sdata)
   }
+	. = 0x80000080;
+	.except_vec3 : {
+		*(.text.exc_vec3)
+	}
 
   . = 0x80400000;
 
