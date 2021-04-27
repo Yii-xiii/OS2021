@@ -192,8 +192,9 @@ env_alloc(struct Env **new, u_int parent_id)
     struct Env *e;
 
     /*Step 1: Get a new Env from env_free_list*/
-	if ((e = LIST_FIRST(&env_free_list)) == NULL) {
-		return -E_NO_MEM;
+	e = LIST_FIRST(&env_free_list);
+	if (e == NULL) {
+		return -E_NO_FREE_ENV;
 	}
 
     /*Step 2: Call certain function(has been completed just now) to init kernel memory layout for this new Env.
@@ -322,7 +323,6 @@ load_icode(struct Env *e, u_char *binary, u_int size)
 }
 
 /* Overview:
- *  Allocates a new env with env_alloc, loads the named elf binary into
  *  it with load_icode and then set its priority value. This function is
  *  ONLY called during kernel initialization, before running the FIRST
  *  user_mode environment.
