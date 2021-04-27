@@ -159,7 +159,7 @@
 		}								\
 		while (LIST_NEXT(temp_elm,field) != NULL) {			\
 			temp_elm = LIST_NEXT(temp_elm,field);			\
-		}								\				
+		}								\
 		LIST_INSERT_AFTER(temp_elm,elm,field);				\
 	} while(0)								
 /* finish your code here. */

@@ -247,7 +247,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     		if (page_alloc(&p) != 0) {
 			return -E_NO_MEM;
 		}
-		if (page_insert((e->env_pgdir), p, va, PTE_R) != 0) {
+		if (page_insert((env->env_pgdir), p, va, PTE_R) != 0) {
 			return -E_NO_MEM;
 		}
 		size = MIN(BY2PG - offset, bin_size);
@@ -259,7 +259,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     		if (page_alloc(&p) != 0) {
 			return -E_NO_MEM;
 		}
-		if (page_insert((e->env_pgdir), p, va+i, PTE_R) != 0) {
+		if (page_insert((env->env_pgdir), p, va+i, PTE_R) != 0) {
 			return -E_NO_MEM;
 		} 
 		size = MIN(BY2PG, bin_size - i);
@@ -271,7 +271,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	if (page_alloc(&p) != 0) {
 		return -E_NO_MEM;
 	}
-	if (page_insert((e->env_pgdir), p, va+i, PTE_R) != 0) {
+	if (page_insert((env->env_pgdir), p, va+i, PTE_R) != 0) {
 		return -E_NO_MEM;
 	}
 	bzero(page2kva(p),BY2PG);
