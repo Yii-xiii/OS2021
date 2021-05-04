@@ -67,6 +67,7 @@ void sys_yield(void)
 	bcopy(KERNEL_SP - sizeof(struct Trapframe), 
 		TIMESTACK - sizeof(struct Trapframe),
 		sizeof(struct Trapframe));
+	syscall_sched_forceReSchedule = 1;
 	sched_yield();
 }
 
@@ -203,6 +204,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if ((perm & PTE_V) == 0 || perm & PTE_COW) { 
 		return -E_INVAL;
 	}
+
 	ret = envid2env(srcid, &srcenv, 0);
 	if (ret < 0 ) {
 		return ret;
@@ -213,7 +215,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	}
 
 	ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte);
-	if (ppage == 0 || ((*ppte) & PTE_V) == 0) {
+	if (ppage == NULL || ((*ppte) & PTE_V) == 0) {
 		return -E_UNSPECIFIED;
 	}
 
@@ -402,14 +404,14 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	if (srcva != 0) {
 		Pte *pte;
 		p = page_lookup(curenv->env_pgdir, ROUNDDOWN(srcva, BY2PG), &pte);
-		if (p == 0 || ((*pte) & PTE_V) == 0) {
+		if (p == NULL || ((*pte) & PTE_V) == 0) {
 			return -E_INVAL;
 		}
 		r = page_insert(e->env_pgdir, p, ROUNDDOWN(e->env_ipc_dstva, BY2PG), perm);
 		if (r < 0) {
 			return r;
 		}
-		e->env_ipc_perm;
+		e->env_ipc_perm = perm;
 	}
 	e->env_ipc_recving = 0;
 	e->env_ipc_from = curenv->env_id;
