@@ -304,14 +304,14 @@ pgdir_walk(Pde *pgdir, u_long va, int create, Pte **ppte)
      * When creating new page table, maybe out of memory. */
 	if (!(*pgdir_entryp & PTE_V) && create) {
 		if (page_alloc(&ppage) == -E_NO_MEM) {
-			*ppte = 0;
+			*ppte = NULL;
 			return -E_NO_MEM;
 		}
 		*pgdir_entryp = page2pa(ppage);
 		*pgdir_entryp = *pgdir_entryp | PTE_V | PTE_R;
 		ppage->pp_ref++;	//mark as used
 	} else if (!(*pgdir_entryp & PTE_V)) {
-		*ppte = 0;
+		*ppte = NULL;
 		return 0;
 	}
 
@@ -424,7 +424,7 @@ page_remove(Pde *pgdir, u_long va)
     /* Step 1: Get the page table entry, and check if the page table entry is valid. */
     ppage = page_lookup(pgdir, va, &pagetable_entry);
 
-    if (ppage == 0) {
+    if (ppage == NULL) {
         return;
     }
 
