@@ -67,7 +67,6 @@ void sys_yield(void)
 	bcopy(KERNEL_SP - sizeof(struct Trapframe), 
 		TIMESTACK - sizeof(struct Trapframe),
 		sizeof(struct Trapframe));
-	syscall_sched_forceReSchedule = 1;
 	sched_yield();
 }
 
@@ -201,7 +200,8 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if (srcva >= UTOP || dstva >= UTOP) {
 		return -E_INVAL;
 	}
-	if ((perm & PTE_V) == 0 || perm & PTE_COW) { 
+	//不需要判断COW?
+	if ((perm & PTE_V) == 0) { 
 		return -E_INVAL;
 	}
 
