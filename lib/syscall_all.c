@@ -148,7 +148,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	int ret;
 	ret = 0;
 
-	if (perm & PTE_V == 0 || perm & PTE_COW) {
+	if ((perm & PTE_V) == 0 || perm & PTE_COW) {
 		return -E_INVAL;
 	}
 
@@ -200,7 +200,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if (srcva >= UTOP || dstva >= UTOP) {
 		return -E_INVAL;
 	}
-	if (perm & PTE_V == 0 || perm & PTE_COW) { 
+	if ((perm & PTE_V) == 0 || perm & PTE_COW) { 
 		return -E_INVAL;
 	}
 	ret = envid2env(srcid, &srcenv, 0);
@@ -213,7 +213,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	}
 
 	ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte);
-	if (ppage == 0 || (*ppte) & PTE_V == 0) {
+	if (ppage == 0 || ((*ppte) & PTE_V) == 0) {
 		return -E_UNSPECIFIED;
 	}
 
@@ -402,7 +402,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	if (srcva != 0) {
 		Pte *pte;
 		p = page_lookup(curenv->env_pgdir, ROUNDDOWN(srcva, BY2PG), &pte);
-		if (p == 0 || (*pte) & PTE_V == 0) {
+		if (p == 0 || ((*pte) & PTE_V) == 0) {
 			return -E_INVAL;
 		}
 		r = page_insert(e->env_pgdir, p, ROUNDDOWN(e->env_ipc_dstva, BY2PG), perm);
