@@ -67,6 +67,7 @@ void sys_yield(void)
 	bcopy(KERNEL_SP - sizeof(struct Trapframe), 
 		TIMESTACK - sizeof(struct Trapframe),
 		sizeof(struct Trapframe));
+	curenv = NULL;
 	sched_yield();
 }
 
@@ -279,7 +280,8 @@ int sys_env_alloc(void)
 	//bcopy(&(curenv->env_tf), &(e->env_tf), sizeof(struct Trapframe));
 	
 	//e->env_status = ENV_NOT_RUNNABLE;
-	
+	//e->env_tf.regs[2] = 0;
+	//e->env_pri = curenv->env_pri;
 	//e->env_tf.pc = curenv->env_tf.cp0_epc;
 	return e->env_id;
 	//	panic("sys_env_alloc not implemented");
@@ -386,7 +388,7 @@ void sys_ipc_recv(int sysno, u_int dstva)
  */
 /*** exercise 4.7 ***/
 int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
-					 u_int perm)
+					 e_int perm)
 {
 
 	int r;
