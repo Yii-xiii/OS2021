@@ -67,7 +67,6 @@ void sys_yield(void)
 	bcopy(KERNEL_SP - sizeof(struct Trapframe), 
 		TIMESTACK - sizeof(struct Trapframe),
 		sizeof(struct Trapframe));
-	syscall_sched_forceReSchedule = 1;
 	sched_yield();
 }
 
