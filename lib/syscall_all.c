@@ -155,7 +155,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	if (va >= UTOP) {
 		return  -E_INVAL;
 	}	
-	int ret = envid2env(envid,&env,0);
+	ret = envid2env(envid,&env,0);
 	if (ret < 0) {
 		return ret;
 	}
@@ -395,23 +395,23 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	if (r < 0) { 
 		return r;
 	}	
-	if (e->env_recving != 1) {
+	if (e->env_ipc_recving != 1) {
 		return -E_IPC_NOT_RECV;
 	}
 
-	if (scrva != 0) {
+	if (srcva != 0) {
 		Pte *pte;
-		p = page_lookup(curenv->pgdir, ROUNDDOWN(srcva, BY2PG), &pte);
+		p = page_lookup(curenv->env_pgdir, ROUNDDOWN(srcva, BY2PG), &pte);
 		if (p == 0 || (*pte) & PTE_V == 0) {
 			return -E_INVAL;
 		}
-		r = page_insert(e->pgdir, p, ROUNDDOWN(e->env_ipc_dstva, BY2PG), perm);
+		r = page_insert(e->env_pgdir, p, ROUNDDOWN(e->env_ipc_dstva, BY2PG), perm);
 		if (r < 0) {
 			return r;
 		}
 		e->env_ipc_perm;
 	}
-	e->env_recving = 0;
+	e->env_ipc_recving = 0;
 	e->env_ipc_from = curenv->env_id;
 	e->env_ipc_value = value;
 	e->env_status = ENV_RUNNABLE;
