@@ -143,7 +143,8 @@ duppage(u_int envid, u_int pn)
 	
 	if ((perm & PTE_R) && !(perm & PTE_LIBRARY)) {
 		syscall_mem_map(0, addr, envid, addr, perm| PTE_COW);
-		curenv->pgdir[pn] = curenv->pgdir[pn] | PTE_COW;
+		syscall_mem_map(0, addr, 0, addr, perm|PTE_COW);
+		//curenv->env_pgdir[pn] = curenv->env_pgdir[pn] | PTE_COW;
 	} else {
 		syscall_mem_map(0, addr, envid, addr, perm);
 	}
@@ -181,14 +182,16 @@ fork(void)
 	}
 
 	if (newenvid == 0) {
-		envid2env(curenv->env_id, &env,0);
+		i = syscall_getenvid();
+		//envid2env(i, &env,0);
+		env = &envs[ENVX(i)];
 		return newenvid;
 	} 
 
 	//else env is father
 	for (i = 0; i < USTACKTOP; i += BY2PG) {
-		if (((Pde *)(*vpd)[PDX(i)] & PTE_V) && (Pte *)(*vpt) [PTX(i)] & PTE_V) {
-			duppage(ret, VPN(i));
+		if ((((*vpd)[PDX(i)]) & PTE_V) && (((*vpt)[PTX(i)]) & PTE_V)) {
+			duppage(newenvid, VPN(i));
 		}
 	}
 	syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
