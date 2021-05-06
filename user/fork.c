@@ -92,7 +92,26 @@ pgfault(u_int va)
     //map the page on the appropriate place
 	
     //unmap the temporary place
+	if (((*vpt)[VPN(va)] & PTE_COW) != 0) {
+		user_panic("Not a COW page!\n");
+	}		
+	tmp = UTOP - 2*BY2PG;
+	int perm = ((*vpt)[VPN(va)] | PTE_V | PTE_R) & ~PTE_COW; 
+	int ret = syscall_mem_alloc(0, tmp, perm);
+	if (ret < 0 ) { 
+		user_panic("page alloc failed...\n");
+	}
 	
+	user_bcopy(ROUNDDOWN(va, BY2PG), tmp, BY2PG);
+	ret = syscall_mem_map(0, tmp, 0, va, perm);
+	if (ret < 0) {
+		user_panic("Page map failed..\n");
+	}
+	
+	ret = syscall_mem_unmap(0,tmp);
+	if (ret < 0) {
+		user_panic("Page unmap failed..\n");
+	}
 }
 
 /* Overview:
@@ -119,6 +138,15 @@ duppage(u_int envid, u_int pn)
 	u_int perm;
 
 	//	user_panic("duppage not implemented");
+	perm = (*vpt)[pn] & 0xfff;
+	addr = pn * BY2PG;
+	
+	if ((perm & PTE_R) && !(perm & PTE_LIBRARY)) {
+		syscall_mem_map(0, addr, envid, addr, perm| PTE_COW);
+		curenv->pgdir[pn] = curenv->pgdir[pn] | PTE_COW;
+	} else {
+		syscall_mem_map(0, addr, envid, addr, perm);
+	}
 }
 
 /* Overview:
@@ -143,8 +171,29 @@ fork(void)
 
 
 	//The parent installs pgfault using set_pgfault_handler
+	set_pgfault_handler(pgfault);
 
 	//alloc a new alloc
+	newenvid = syscall_env_alloc();
+
+	if (newenvid < 0) {
+		return newenvid;
+	}
+
+	if (newenvid == 0) {
+		envid2env(curenv->env_id, &env,0);
+		return newenvid;
+	} 
+
+	//else env is father
+	for (i = 0; i < USTACKTOP; i += BY2PG) {
+		if (((Pde *)(*vpd)[PDX(i)] & PTE_V) && (Pte *)(*vpt) [PTX(i)] & PTE_V) {
+			duppage(ret, VPN(i));
+		}
+	}
+	syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
+	syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
+	syscall_set_env_status(newenvid,  ENV_RUNNABLE);
 
 
 	return newenvid;

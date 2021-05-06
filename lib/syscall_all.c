@@ -118,6 +118,13 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 	struct Env *env;
 	int ret;
 
+	ret = envid2env(envid, &env, 0);
+	if (ret < 0) {
+		return ret;
+	}
+
+	env->env_pgfault_handler = func;
+	env->env_xstacktop = xstacktop;
 
 	return 0;
 	//	panic("sys_set_pgfault_handler not implemented");
@@ -310,6 +317,22 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 	struct Env *env;
 	int ret;
 
+	ret = envid2env(envid, &env, 0);
+	if (ret < 0) { 
+		return ret;
+	}
+
+	if (env->env_status != ENV_RUNNABLE || env->env_status != ENV_NOT_RUNNABLE || env->env_status != ENV_FREE) {
+		return -E_INVAL;
+	} 
+
+	if (env->env_status != ENV_RUNNABLE && status == ENV_RUNNABLE) {
+		LIST_INSERT_TAIL(env_sched_list,env,env_sched_link);
+	} else if (env->env_status == ENV_RUNNABLE && status != ENV_RUNNABLE) {
+		LIST_REMOVE(env, env_sched_link);
+	}
+
+	env->env_status = status;
 	return 0;
 	//	panic("sys_env_set_status not implemented");
 }
