@@ -18,7 +18,6 @@ struct Env_list env_sched_list[2];      // Runnable list
 extern Pde *boot_pgdir;
 extern char *KERNEL_SP;
 
-
 /* Overview:
  *  This function is for making an unique ID for every env.
  *
@@ -243,7 +242,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     int r;
     u_long offset = va - ROUNDDOWN(va, BY2PG);
 	
-	u_int32_t size;
+	u_int32_t size = 0;
 	if (offset != 0) {
     		if (page_alloc(&p) != 0) {
 			return -E_NO_MEM;
@@ -268,6 +267,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	}
     /*Step 2: alloc pages to reach `sgsize` when `bin_size` < `sgsize`.
     * hint: variable `i` has the value of `bin_size` now! */
+	i = ROUND(i, BY2PG);
     while (i < sgsize) {
 	if (page_alloc(&p) != 0) {
 		return -E_NO_MEM;

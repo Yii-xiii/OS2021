@@ -30,7 +30,7 @@ void sched_yield(void)
      *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
      */
 	struct Env *e = curenv; 
-	if (count == 0 || e == NULL || e->env_status != ENV_RUNNABLE) {
+	if (count == 0) {
 		if (e != NULL) {
 			LIST_REMOVE(e, env_sched_link);
 			LIST_INSERT_TAIL(&(env_sched_list[1-point]), e, env_sched_link);
