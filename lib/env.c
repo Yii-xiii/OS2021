@@ -137,7 +137,7 @@ env_setup_vm(struct Env *e)
     /* Step 1: Allocate a page for the page directory
      * using a function you completed in the lab2 and add its pp_ref.
      * pgdir is the page directory of Env e, assign value for it. */
-    if (page_alloc(&p) == -E_NO_MEM) {
+    if (page_alloc(&p) < 0){
         panic("env_setup_vm - page alloc error\n");
         return r;
     }
@@ -275,7 +275,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	if (page_insert((env->env_pgdir), p, va+i, PTE_R) != 0) {
 		return -E_NO_MEM;
 	}
-	bzero(page2kva(p),BY2PG);
+	//bzero(page2kva(p),BY2PG);
 	i += BY2PG;
     }
     return 0;
@@ -309,11 +309,17 @@ load_icode(struct Env *e, u_char *binary, u_int size)
     u_long perm;
 
     /*Step 1: alloc a page. */
-	page_alloc(&p);
+	r = page_alloc(&p);
+	if (r < 0) {
+		return;
+	}
 
     /*Step 2: Use appropriate perm to set initial stack for new Env. */
     /*Hint: Should the user-stack be writable? */
-	page_insert((e->env_pgdir), p, USTACKTOP - BY2PG, PTE_R);
+	r = page_insert((e->env_pgdir), p, USTACKTOP - BY2PG, (PTE_R | PTE_V));
+	if (r < 0) {
+		return;
+	}
 
     /*Step 3:load the binary using elf loader. */
 	load_elf(binary, size, &entry_point, e, load_icode_mapper);
@@ -336,7 +342,10 @@ env_create_priority(u_char *binary, int size, int priority)
 {
         struct Env *e;
     /*Step 1: Use env_alloc to alloc a new env. */
-	env_alloc(&e,0);
+	int ret = env_alloc(&e,0);
+	if (ret < 0) {
+		return ret;
+	}
 
     /*Step 2: assign priority to the new env. */
 	e->env_pri = priority;
@@ -450,7 +459,7 @@ env_run(struct Env *e)
 	curenv = e;
 
     /*Step 3: Use lcontext() to switch to its address space. */
-	lcontext(e->env_pgdir);
+	lcontext((int)e->env_pgdir);
 
     /*Step 4: Use env_pop_tf() to restore the environment's
      * environment   registers and return to user mode.
