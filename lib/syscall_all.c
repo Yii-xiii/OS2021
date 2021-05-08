@@ -227,7 +227,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 		return -E_UNSPECIFIED;
 	}
 
-	if (ppte != NULL && (perm & PTE_R) && ((*ppte&PTE_R) == 0)) {
+	if (ppte != NULL && (perm & PTE_R) && ((*ppte)&PTE_R) == 0) {
 		return -E_UNSPECIFIED;
 	}
 
@@ -422,6 +422,9 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	struct Env *e;
 	struct Page *p;
 
+	if (srcva >= UTOP) {
+		return -E_INVAL;
+	}
 	r = envid2env(envid, &e, 0);
 	if (r < 0) { 
 		return r;

@@ -101,10 +101,10 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
      * table. */
 	if (!(*pgdir_entryp & PTE_V) && create) {
 		*pgdir_entryp = PADDR(alloc(BY2PG,BY2PG,1));
-		if (pgdir_entryp == -E_NO_MEM) {
-			return -E_NO_MEM;
-		}
-		*pgdir_entryp = *pgdir_entryp | PTE_V | PTE_R;
+		//if (pgdir_entryp == -E_NO_MEM) {
+		//	return -E_NO_MEM;
+		//}
+		*pgdir_entryp = *pgdir_entryp | PTE_V;
 	} else if (!pgdir_entryp & PTE_V) {
 		return 0;
 	}
