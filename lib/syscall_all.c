@@ -223,7 +223,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	}
 
 	ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte);
-	if (ppage == NULL || ((*ppte) & PTE_V) == NULL) {
+	if (ppage == 0 || ((*ppte) & PTE_V) == 0) {
 		return -E_UNSPECIFIED;
 	}
 
@@ -293,7 +293,7 @@ int sys_env_alloc(void)
 	e->env_status = ENV_NOT_RUNNABLE;
 	e->env_tf.regs[2] = 0;
 	e->env_pri = curenv->env_pri;
-	e->env_tf.pc = curenv->env_tf.cp0_epc;
+	e->env_tf.pc = e->env_tf.cp0_epc;
 	return e->env_id;
 	//	panic("sys_env_alloc not implemented");
 }
@@ -322,7 +322,7 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 		return ret;
 	}
 
-	if (env->env_status != ENV_RUNNABLE || env->env_status != ENV_NOT_RUNNABLE || env->env_status != ENV_FREE) {
+	if (status != ENV_RUNNABLE || status != ENV_NOT_RUNNABLE || status != ENV_FREE) {
 		return -E_INVAL;
 	} 
 
@@ -433,7 +433,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	if (srcva != 0 || srcva != NULL) {
 		Pte *pte;
 		p = page_lookup(curenv->env_pgdir, ROUNDDOWN(srcva, BY2PG), &pte);
-		if (p == NULL || ((*pte) & PTE_V) == NULL) {
+		if (p == 0 || ((*pte) & PTE_V) == 0) {
 			return -E_INVAL;
 		}
 		r = page_insert(e->env_pgdir, p, ROUNDDOWN(e->env_ipc_dstva, BY2PG), perm);

@@ -92,7 +92,7 @@ pgfault(u_int va)
     //map the page on the appropriate place
 	
     //unmap the temporary place
-	if (((*vpt)[VPN(va)] & PTE_COW) != 0) {
+	if (((*vpt)[VPN(va)] & PTE_COW) == 0) {
 		user_panic("Not a COW page!\n");
 	}		
 	tmp = UTOP - 2*BY2PG;

@@ -424,7 +424,7 @@ page_remove(Pde *pgdir, u_long va)
     /* Step 1: Get the page table entry, and check if the page table entry is valid. */
     ppage = page_lookup(pgdir, va, &pagetable_entry);
 
-    if (ppage == NULL) {
+    if (ppage == 0) {
         return;
     }
 
