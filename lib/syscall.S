@@ -13,7 +13,7 @@ NESTED(handle_sys,TF_SIZE, sp)
 
     // TODO: Fetch EPC from Trapframe, calculate a proper value and store it back to trapframe.
 	lw t0,TF_EPC(sp)
-	addiu t0,a0, 4
+	addiu t0,t0, 4
 	sw t0,TF_EPC(sp)
 
     // TODO: Copy the syscall number into $a0.
