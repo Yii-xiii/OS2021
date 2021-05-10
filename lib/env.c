@@ -141,9 +141,7 @@ env_setup_vm(struct Env *e)
         return r;
     }
 	p->pp_ref++;
-	pgdir = page2kva(p);
-	e->env_pgdir = pgdir;
-	e->env_cr3 = PADDR(pgdir);
+	pgdir = (Pde *) page2kva(p);
 
 
     /*Step 2: Zero pgdir's field before UTOP. */
@@ -160,6 +158,8 @@ env_setup_vm(struct Env *e)
 
 
     // UVPT maps the env's own page table, with read-only permission.
+	e->env_pgdir = pgdir;
+	e->env_cr3 = PADDR(pgdir);
     e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V;
     return 0;
 }
@@ -251,7 +251,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 			return -E_NO_MEM;
 		}
 		size = MIN(BY2PG - offset, bin_size);
-		bcopy(bin, page2kva(p) + offset, size);
+		bcopy((void *)bin, (void *) (page2kva(p) + offset), size);
 	}
     /*Step 1: load all content of bin into memory. */
     for (i = size; i < bin_size; i += BY2PG) {
@@ -263,7 +263,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 			return -E_NO_MEM;
 		} 
 		size = MIN(BY2PG, bin_size - i);
-		bcopy(bin + i, page2kva(p), size);
+		bcopy((void *) (bin + i), (void *) page2kva(p), size);
 	}
     /*Step 2: alloc pages to reach `sgsize` when `bin_size` < `sgsize`.
     * hint: variable `i` has the value of `bin_size` now! */
@@ -344,7 +344,7 @@ env_create_priority(u_char *binary, int size, int priority)
     /*Step 1: Use env_alloc to alloc a new env. */
 	int ret = env_alloc(&e,0);
 	if (ret < 0) {
-		return ret;
+		return;
 	}
 
     /*Step 2: assign priority to the new env. */

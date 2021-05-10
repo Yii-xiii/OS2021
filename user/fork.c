@@ -83,7 +83,7 @@ static void
 pgfault(u_int va)
 {
 	u_int *tmp;
-	//	writef("fork.c:pgfault():\t va:%x\n",va);
+		//writef("fork.c:pgfault():\t va:%x\n",va);
     
     //map the new page at a temporary place
 
@@ -96,7 +96,7 @@ pgfault(u_int va)
 		user_panic("Not a COW page!\n");
 	}		
 	tmp = UTOP - 2*BY2PG;
-	int perm = ((*vpt)[VPN(va)] | PTE_V | PTE_R) & ~PTE_COW; 
+	int perm = (((*vpt)[VPN(va)] & 0xfff) | PTE_V | PTE_R) & ~PTE_COW; 
 	int ret = syscall_mem_alloc(0, tmp, perm);
 	if (ret < 0 ) { 
 		user_panic("page alloc failed...\n");
@@ -171,33 +171,47 @@ fork(void)
 	u_int i;
 
 
+//writef("fork start\n");
 	//The parent installs pgfault using set_pgfault_handler
 	set_pgfault_handler(pgfault);
 
 	//alloc a new alloc
+//writef("syscall_env_alloc %d start\n",syscall_getenvid());
 	newenvid = syscall_env_alloc();
+//writef("syscall_env_alloc %d returned\n",newenvid);
 
 	if (newenvid < 0) {
 		return newenvid;
 	}
 
 	if (newenvid == 0) {
+//writef("syscall_getenvid\n");
 		i = syscall_getenvid();
+//writef("syscall_getenvid return\n");
 		//envid2env(i, &env,0);
 		env = &envs[ENVX(i)];
+writef("child return\n");
 		return newenvid;
 	} 
 
+//writef("duppage start\n");
 	//else env is father
+//writef("%x : %x : %x\n",*vpd,(*vpd)[PDX(*vpt)],(*vpt));
 	for (i = 0; i < USTACKTOP; i += BY2PG) {
-		if ((((*vpd)[PDX(i)]) & PTE_V) && (((*vpt)[PTX(i)]) & PTE_V)) {
+//if ((*vpd)[PDX(i)] & PTE_V) {
+//writef("%x\n",i);
+//}
+//writef("%x : %d %d\n",i,(*vpd)[PDX(i)], (*vpt)[PTX(i)]);
+		if ((((*vpd)[PDX(i)]) & PTE_V) && (((*vpt)[VPN(i)]) & PTE_V)) {
+//writef("duppage : %x\n",i);
 			duppage(newenvid, VPN(i));
 		}
 	}
+//writef("duppage ind\n");
 	syscall_mem_alloc(newenvid, UXSTACKTOP - BY2PG, PTE_V | PTE_R);
 	syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
 	syscall_set_env_status(newenvid,  ENV_RUNNABLE);
-
+//writef("fork return\n");
 
 	return newenvid;
 }

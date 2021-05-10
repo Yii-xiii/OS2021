@@ -322,7 +322,7 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 		return ret;
 	}
 
-	if (status != ENV_RUNNABLE || status != ENV_NOT_RUNNABLE || status != ENV_FREE) {
+	if (status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE && status != ENV_FREE) {
 		return -E_INVAL;
 	} 
 
@@ -433,7 +433,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 		return -E_IPC_NOT_RECV;
 	}
 
-	if (srcva != 0 || srcva != NULL) {
+	if (srcva != 0 && srcva != NULL) {
 		Pte *pte;
 		p = page_lookup(curenv->env_pgdir, ROUNDDOWN(srcva, BY2PG), &pte);
 		if (p == 0 || ((*pte) & PTE_V) == 0) {
