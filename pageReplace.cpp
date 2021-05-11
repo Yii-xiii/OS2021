@@ -5,7 +5,7 @@
 #define get_Page(x) (x>>MAX_PAGE)
 
 #define MAX_VALUE 2147483647
-#define N 32768 //2^15
+#define N 268435456
 
 struct Page {
         struct Page *next = NULL;
@@ -109,12 +109,13 @@ void pageReplace(long *physic_memery, long nwAdd) {
 
 		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count < pages[replace].count)) {
 		                    replace = index;
-		                    min = pages[index].hit;
+		                    min = --pages[index].hit;
 		                    index = (index + 1) % MAX_PHY_PAGE;
 		                    if (min == -1) {
 		                    	break;
 		                    }
 	                } else {
+					pages[index].hit--;
 		                    index = (index + 1) % MAX_PHY_PAGE;
 		            }
 
