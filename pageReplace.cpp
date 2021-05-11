@@ -80,7 +80,7 @@ void addToMap(struct Page* p) {
 
 void pageReplace(long *physic_memery, long nwAdd) {
     	static int index = 0;
-    	static int count = 0;
+    	//static int count = 0;
         int replace = -1; 
         int min = MAX_VALUE;
         int pgNum = get_Page(nwAdd);
