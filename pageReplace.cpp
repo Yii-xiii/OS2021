@@ -5,7 +5,7 @@
 #define get_Page(x) (x>>MAX_PAGE)
 
 #define MAX_VALUE 2147483647
-#define N 268435456
+#define N 1048576
 
 struct Page {
         struct Page *next = NULL;
