@@ -28,7 +28,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		return;
 	}
 
-	int end = (index + MAX_PHY_PAGE - 1) % MAX_PHY_PAGE;
+	int end = index;
 	        while (true) {
 	                if (nodes[index].pgNum == pgNum) {
 		                    replace = -1;
