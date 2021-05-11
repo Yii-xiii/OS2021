@@ -1,6 +1,6 @@
 #include "pageReplace.h" 
 #include <stdio.h>
-#define MAX_PHY_PAGE 64
+#define MAX_PHY_PAGE 4
 #define MAX_PAGE 12
 #define get_Page(x) (x>>MAX_PAGE)
 
@@ -10,8 +10,9 @@
 struct Page {
         struct Page *next = NULL;
         struct Page *prev = NULL;
-        long pgNum = -1;
+        int pgNum = -1;
         int hit = -1;
+        long count;
 };
 /*
 struct Node {
@@ -23,6 +24,7 @@ struct Node {
 
 struct Page *pagemap[N];
 struct Page pages[MAX_PHY_PAGE];
+static unsigned long cnt = 0;
 
 int containPage(int pgNum) {
 	struct Page *p;
@@ -36,6 +38,7 @@ int containPage(int pgNum) {
 	while (p != NULL) {
 		if (p->pgNum == pgNum) {
 			p->hit++;
+			p->count = cnt++;
 			return 1;
 		}
 		p = p->next;
@@ -58,7 +61,7 @@ void rmFromMap(struct Page* p) {
 }
 
 void addToMap(struct Page* p) {
-	struct Page *head = pagemap[p->pgNum & (N - 1)];
+	struct Page *head = pagemap[(p->pgNum) & (N - 1)];
 	if (head == NULL) {
 		pagemap[p->pgNum & (N - 1)] = p;
 		return;
@@ -104,7 +107,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		            */
 
 
-		            if (pages[index].hit < min) {
+		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count > pages[index].count)) {
 		                    replace = index;
 		                    min = pages[index].hit;
 		                    index = (index + 1) % MAX_PHY_PAGE;
@@ -128,6 +131,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
         		//printf("return from rm\n");
                 pages[replace].pgNum = pgNum;
                 pages[replace].hit = 0;
+                pages[replace].count = cnt++;
         		addToMap(pages + replace);
                 physic_memery[replace] = pgNum;
         }
