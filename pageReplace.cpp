@@ -35,18 +35,19 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		                    nodes[index].hit++;
 		                    index = (index + 1) % MAX_PHY_PAGE;
 		                    break;
-		            } else if (index == end) {
-		                    index = (index + 2) % MAX_PHY_PAGE;
-	                        break;
 		            }
-
 		            if (nodes[index].hit < min) {
 		                    replace = index;
 		                    min = nodes[index].hit;
 		                    index = (index + 1) % MAX_PHY_PAGE;
 	                } else {
 		                    index = (index + 1) % MAX_PHY_PAGE;
+		            } 
+				if (index == end) {
+		                    index = (index + 2) % MAX_PHY_PAGE;
+	                        break;
 		            }
+
 		    }
 		    
 	    
