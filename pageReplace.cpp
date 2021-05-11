@@ -1,6 +1,6 @@
 #include "pageReplace.h" 
 #include <stdio.h>
-#define MAX_PHY_PAGE 4
+#define MAX_PHY_PAGE 64
 #define MAX_PAGE 12
 #define get_Page(x) (x>>MAX_PAGE)
 
@@ -107,7 +107,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		            */
 
 
-		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count > pages[index].count)) {
+		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count > pages[replace].count)) {
 		                    replace = index;
 		                    min = pages[index].hit;
 		                    index = (index + 1) % MAX_PHY_PAGE;
