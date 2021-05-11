@@ -1,6 +1,6 @@
 #include "pageReplace.h" 
 #include <stdio.h>
-#define MAX_PHY_PAGE 64
+#define MAX_PHY_PAGE 4
 #define MAX_PAGE 12
 #define get_Page(x) (x>>MAX_PAGE)
 
@@ -27,11 +27,13 @@ struct Page pages[MAX_PHY_PAGE];
 int containPage(int pgNum) {
 	struct Page *p;
 	p = pagemap[(pgNum & (N - 1))];
+	/*
 	if (p == NULL) {
 		return 0;
 	}
+	*/
 
-	while (p->pgNum != -1) {
+	while (p != NULL) {
 		if (p->pgNum == pgNum) {
 			p->hit++;
 			return 1;
@@ -64,7 +66,7 @@ void addToMap(struct Page* p) {
 
 	p->prev = head;
 	if ((head)->next != NULL) {
-		(*((head)->next)).prev = p;
+		((head)->next)->prev = p;
 	}
 	p->next = (head)->next;
 	pagemap[p->pgNum & (N - 1)] = p;
