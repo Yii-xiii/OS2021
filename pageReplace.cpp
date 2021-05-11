@@ -1,6 +1,6 @@
 #include "pageReplace.h" 
 #include <stdio.h>
-#define MAX_PHY_PAGE 4
+#define MAX_PHY_PAGE 64
 #define MAX_PAGE 12
 #define get_Page(x) (x>>MAX_PAGE)
 
@@ -12,7 +12,7 @@ struct Page {
         struct Page *prev = NULL;
         int pgNum = -1;
         int hit = -1;
-        long count = 0;
+        unsigned long count = 0;
 };
 /*
 struct Node {
