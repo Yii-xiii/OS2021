@@ -33,7 +33,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		                    index = (index + 1) % MAX_PHY_PAGE;
 		                    break;
 		            } else if (index == end) {
-		                    index = (index + 2) % MAX_PHY_PAGE;
+		                    index = (index + 1) % MAX_PHY_PAGE;
 	                        break;
 		            }
 
