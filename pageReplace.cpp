@@ -4,59 +4,50 @@
 #define MAX_PAGE 12
 #define get_Page(x) (x>>MAX_PAGE)
 
+#define MAX_VALUE 2147483647
+
 struct Node {
         //struct Node *next;
         //struct Node **prev;
-        long pgNum;
-        int status = 0;
+        long pgNum = -1;
+        int hit = -1;
 };
 
 //struct Node *head = NULL;
 struct Node nodes[MAX_PHY_PAGE];
 
 void pageReplace(long *physic_memery, long nwAdd) {
-        static int index = 0;
-        static int count = 0;
+    	static int index = 0;
+    	//static int cold = 0;
         int replace = -1; 
+        int min = MAX_VALUE;
         int pgNum = get_Page(nwAdd);
+	    int end = (index + MAX_PHY_PAGE - 1) % MAX_PHY_PAGE;
 
 
-        if (count) {
-	        int end = (index + count - 1) % count;
-	        int mod = count == MAX_PHY_PAGE ? count : count + 1;
-		        while (true) {
-		                if ((replace == -1) && (!nodes[index].status)) {
-		                        replace = index;
-		                        //if ((nodes + index) == NULL) {
-		                        //      break;
-		                        //} 
-		                        index = (index + 1) % mod;
-		                } else if (nodes[index].pgNum == pgNum) {
-		                        replace = -1;
-		                        nodes[index].status = 2;
-		                        index = (index + 1) % MAX_PHY_PAGE;
-		                        break;
-		                } else {
-		                        nodes[index].status--;
-		                        index = (index + 1) % mod;
-		                }
-
-		                if ((replace != -1) && index == end) {
-		                        index = (index + 1) % mod;
-		                        break;
-		                }
-		        }
-	    } else {
-	    	replace = 0;
-	    	index++;
-	    }
+	        while (true) {
+	                if (nodes[index].hit < min) {
+		                    replace = index;
+		                    min = nodes[index].hit;
+		                    index = (index + 1) % MAX_PHY_PAGE;
+	                } else if (nodes[index].pgNum == pgNum) {
+		                    replace = -1;
+		                    nodes[index].hit++;
+		                    index = (index + 1) % MAX_PHY_PAGE;
+		                    break;
+		            } else if ((replace != -1) && index == end) {
+		                    index = (index + 1) % MAX_PHY_PAGE;
+	                        break;
+		            } else {
+		                    index = (index + 1) % MAX_PHY_PAGE;
+		            }
+		    }
+		    
+	    
 
         if (replace != -1) {
                 nodes[replace].pgNum = pgNum;
-                nodes[replace].status = 2;
+                nodes[replace].hit = 0;
                 physic_memery[replace] = pgNum;
-                if (count != MAX_PHY_PAGE) {
-                        count++;
-                }
         }
 }
