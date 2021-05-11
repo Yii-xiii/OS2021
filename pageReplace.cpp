@@ -22,10 +22,13 @@ void pageReplace(long *physic_memery, long nwAdd) {
         int replace = -1; 
         int min = MAX_VALUE;
         int pgNum = get_Page(nwAdd);
-	    int end = (index + MAX_PHY_PAGE - 1) % MAX_PHY_PAGE;
 
 	    //printf("start at : %d\n",index);
+	if (!pgNum){
+		return;
+	}
 
+	int end = (index + MAX_PHY_PAGE - 1) % MAX_PHY_PAGE;
 	        while (true) {
 	                if (nodes[index].pgNum == pgNum) {
 		                    replace = -1;
@@ -33,7 +36,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		                    index = (index + 1) % MAX_PHY_PAGE;
 		                    break;
 		            } else if (index == end) {
-		                    index = (index + 1) % MAX_PHY_PAGE;
+		                    index = (index + 2) % MAX_PHY_PAGE;
 	                        break;
 		            }
 
