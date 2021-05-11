@@ -12,7 +12,7 @@ struct Page {
         struct Page *prev = NULL;
         int pgNum = -1;
         int hit = -1;
-        long count;
+        long count = 0;
 };
 /*
 struct Node {
@@ -107,7 +107,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		            */
 
 
-		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count > pages[replace].count)) {
+		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count < pages[replace].count)) {
 		                    replace = index;
 		                    min = pages[index].hit;
 		                    index = (index + 1) % MAX_PHY_PAGE;
