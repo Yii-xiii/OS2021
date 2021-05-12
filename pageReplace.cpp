@@ -5,13 +5,13 @@
 #define get_Page(x) (x>>MAX_PAGE)
 
 #define MAX_VALUE 2147483647
-#define N 1048576
+#define N 32768 //2^15
 
 struct Page {
         struct Page *next = NULL;
         struct Page *prev = NULL;
         int pgNum = -1;
-        int hit = -1;
+        int hit = MAX_VALUE;
         unsigned long count = 0;
 };
 /*
@@ -37,7 +37,7 @@ int containPage(int pgNum) {
 
 	while (p != NULL) {
 		if (p->pgNum == pgNum) {
-			p->hit = MAX_PHY_PAGE;
+			p->hit--;
 			p->count = cnt++;
 			return 1;
 		}
@@ -82,7 +82,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
     	static int index = 0;
     	//static int count = 0;
         int replace = -1; 
-        int min = MAX_VALUE;
+        int max = -MAX_VALUE;
         int pgNum = get_Page(nwAdd);
 
 	    //printf("start at : %d\n",index);
@@ -107,15 +107,16 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		            */
 
 
-		            if (pages[index].hit < min || (pages[index].hit == min && pages[index].count < pages[replace].count)) {
+		            if ((max < (MAX_PHY_PAGE/2) && pages[index].hit > max) || 
+		            	(pages[index].hit > (MAX_PHY_PAGE/2) && pages[index].count < pages[replace].count)) {
 		                    replace = index;
-		                    min = --pages[index].hit;
+		                    max = pages[index].hit++;
 		                    index = (index + 1) % MAX_PHY_PAGE;
-		                    if (min == -1) {
+		                    if (max == MAX_VALUE) {
 		                    	break;
 		                    }
 	                } else {
-					pages[index].hit--;
+	                		pages[index].hit++;
 		                    index = (index + 1) % MAX_PHY_PAGE;
 		            }
 
@@ -131,7 +132,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
         		rmFromMap(pages + replace);
         		//printf("return from rm\n");
                 pages[replace].pgNum = pgNum;
-                pages[replace].hit = MAX_PHY_PAGE;
+                pages[replace].hit = 0;
                 pages[replace].count = cnt++;
         		addToMap(pages + replace);
                 physic_memery[replace] = pgNum;
