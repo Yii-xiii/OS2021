@@ -107,8 +107,8 @@ void pageReplace(long *physic_memery, long nwAdd) {
 		            */
 
 
-		            if ((max < (MAX_PHY_PAGE/2) && pages[index].hit > max) || 
-		            	(pages[index].hit > (MAX_PHY_PAGE/2) && pages[index].count < pages[replace].count)) {
+		            if ((max < (MAX_PHY_PAGE-10) && pages[index].hit > max) || 
+		            	(pages[index].hit > (MAX_PHY_PAGE-10) && pages[index].count < pages[replace].count)) {
 		                    replace = index;
 		                    max = pages[index].hit++;
 		                    index = (index + 1) % MAX_PHY_PAGE;
