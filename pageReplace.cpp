@@ -7,11 +7,13 @@
 #define MAX_VALUE 2147483647
 #define N 32768 //2^15
 #define M MAX_PHY_PAGE/2
+#define MAX(a,b) ((a) > (b) ? a : b)
 
 struct Page {
         struct Page *next = NULL;
         struct Page *prev = NULL;
         int pgNum = -1; 
+	int last = 0;
         int hit = MAX_PHY_PAGE;
         unsigned long count = 0;
 };
@@ -38,6 +40,8 @@ int containPage(int pgNum) {
        while (p != NULL) {
                 if (p->pgNum == pgNum) {
                         //p->hit-=2;
+			last = p->hit;
+			p->hit=0;
                         p->count = cnt++;
                         return 1;
                 }
@@ -113,7 +117,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
                                         replace = index;
                                         flag = 0;
                             } else if (flag && //((max < (M) && pages[index].count < pages[replace].count) || 
-                                (pages[index].hit > (M) && pages[index].count < pages[replace].count)) {
+                                (pages[index].hit > MAX(M,pages[index].last) && pages[index].count < pages[replace].count)) {
                                     replace = index;
                                     max = pages[index].hit++;
                                     //index = (index + 1) % MAX_PHY_PAGE;
