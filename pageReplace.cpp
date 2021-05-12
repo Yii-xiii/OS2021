@@ -1,19 +1,20 @@
 #include "pageReplace.h" 
 #include <stdio.h>
-#define MAX_PHY_PAGE 64
+#define MAX_PHY_PAGE 60
 #define MAX_PAGE 12
 #define get_Page(x) (x>>MAX_PAGE)
 
 #define MAX_VALUE 2147483647
 #define N 32768 //2^15
 #define M MAX_PHY_PAGE/2
-#define MAX(a,b) ((a) > (b) ? a : b)
+
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
 
 struct Page {
         struct Page *next = NULL;
         struct Page *prev = NULL;
-        int pgNum = -1; 
-	int last = 0;
+        int pgNum = -1;
+        int last = 0; 
         int hit = MAX_PHY_PAGE;
         unsigned long count = 0;
 };
@@ -25,10 +26,10 @@ struct Node {
 };
 */
 
+struct Page *pagemap[N];
 struct Page pages[MAX_PHY_PAGE];
 static unsigned long cnt = 1;
 
-struct Page *pagemap[N];
 
 int containPage(int pgNum) {
         struct Page *p;
@@ -40,8 +41,8 @@ int containPage(int pgNum) {
        while (p != NULL) {
                 if (p->pgNum == pgNum) {
                         //p->hit-=2;
-			last = p->hit;
-			p->hit=0;
+                		p->last = p->hit;
+                		p->hit = 0;
                         p->count = cnt++;
                         return 1;
                 }
@@ -84,7 +85,7 @@ void addToMap(struct Page* p) {
 
 
 void pageReplace(long *physic_memery, long nwAdd) {
-        int index = 0;
+        static int index = 0;
         //static int count = 0;
         int flag = 1;
         int replace = 0;
@@ -103,7 +104,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
             
 
             //printf("miss\n");
-            //int end = index;
+            int end = index;
                 while (pgNum) {
                         	/*if (pages[index].pgNum == pgNum) {
                                     flag = 0;
@@ -129,9 +130,9 @@ void pageReplace(long *physic_memery, long nwAdd) {
                                     //index = (index + 1) % MAX_PHY_PAGE;
                             }
 
-                            index = (index + 1); // % MAX_PHY_PAGE;
-                            if (index == MAX_PHY_PAGE) {
-                                    index = (index + 1); // % MAX_PHY_PAGE;
+                            index = (index + 1) % MAX_PHY_PAGE;
+                            if (index == end) {
+                                    index = (index + 1) % MAX_PHY_PAGE;
                                 break;
                             }
                     }
@@ -139,12 +140,13 @@ void pageReplace(long *physic_memery, long nwAdd) {
             //printf("replace : %d\n",replace);
 
         //if (replace != -1) {
-                        rmFromMap(pages + replace);
-                        //printf("return from rm\n");
+                rmFromMap(pages + replace);
+                //printf("return from rm\n");
                 pages[replace].pgNum = pgNum;
                 pages[replace].hit = 0;
                 pages[replace].count = cnt++;
-                        addToMap(pages + replace);
+                pages[replace].last = 0;
+                addToMap(pages + replace);
                 physic_memery[replace] = pgNum;
         //}
 }
