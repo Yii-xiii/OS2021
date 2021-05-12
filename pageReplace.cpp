@@ -15,7 +15,7 @@ struct Page {
         struct Page *prev = NULL;
         int pgNum = -1;
         int last = 0; 
-        int hitOther = 0;
+        int hitOther = MAX_PHY_PAGE;
         unsigned long count = 0;
 };
 /*
