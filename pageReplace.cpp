@@ -6,7 +6,7 @@
 
 #define MAX_VALUE 2147483647
 #define N 32768 //2^15
-#define M MAX_PHY_PAGE/2
+#define M MAX_PHY_PAGE/3
 
 struct Page {
         struct Page *next = NULL;
