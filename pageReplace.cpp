@@ -6,7 +6,7 @@
 
 #define MAX_VALUE 2147483647
 #define N 4096 //2^12
-#define M MAX_PHY_PAGE >> 3
+#define M (MAX_PHY_PAGE - (MAX_PHY_PAGE >> 3))
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
