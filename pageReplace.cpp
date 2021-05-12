@@ -104,7 +104,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
 
             //printf("miss\n");
             //int end = index;
-                while (pgNum) {
+                while (true) {
                         	/*if (pages[index].pgNum == pgNum) {
                                     flag = 0;
                                     replace = -1;
