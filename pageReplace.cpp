@@ -80,7 +80,7 @@ void addToMap(struct Page* p) {
 
 
 void pageReplace(long *physic_memery, long nwAdd) {
-        static int index = 0;
+        int index = 0;
         //static int count = 0;
         int flag = 1;
         int replace = 0;
@@ -99,7 +99,7 @@ void pageReplace(long *physic_memery, long nwAdd) {
             
 
             //printf("miss\n");
-            int end = index;
+            //int end = index;
                 while (pgNum) {
                         	/*if (pages[index].pgNum == pgNum) {
                                     flag = 0;
@@ -125,9 +125,9 @@ void pageReplace(long *physic_memery, long nwAdd) {
                                     //index = (index + 1) % MAX_PHY_PAGE;
                             }
 
-                            index = (index + 1) % MAX_PHY_PAGE;
-                            if (index == end) {
-                                    index = (index + 1) % MAX_PHY_PAGE;
+                            index = (index + 1); // % MAX_PHY_PAGE;
+                            if (index == MAX_PHY_PAGE) {
+                                    index = (index + 1); // % MAX_PHY_PAGE;
                                 break;
                             }
                     }
