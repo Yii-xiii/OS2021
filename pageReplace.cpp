@@ -37,7 +37,7 @@ int containPage(int pgNum) {
         //}
        while (p != NULL) {
                 if (p->pgNum == pgNum) {
-                        p->hit--;
+                        p->hit-=2;
                         p->count = cnt++;
                         return 1;
                 }
