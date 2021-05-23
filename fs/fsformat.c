@@ -212,10 +212,38 @@ struct File *create_file(struct File *dirf) {
     // Step1: According to different range of nblk, make classified discussion to 
     //        calculate the correct block number.
 
-
     // Step2: Find an unused pointer
+	for (i = 0, found = 0; i < nblk && i < 10; i++) {
+		bno = dirf->f_direct[i];
+		dirblk = (struct File *) &(disk[bno].data);
+		
+		for (int j = 0; j < FILE2BLK; j++) {
+			if ((&dirblk[j])->f_name[0]=='\0') {
+				found = 1;
+				break;
+			}
+		}
+	}
 
+	if (!found) {
+		for (;i < nblk; i++ ) {
+			bno = ((int *) (disk[dirf->f_indirect].data))[i];
+			dirblk = (struct File *) &(disk[bno].data);
 
+			for (int j = 0; j < FILE2BLK; j++) {
+				if ((&dirblk[j])->f_name[0]=='\0') {
+					found = 1;
+					break;
+				}
+			}
+		}
+	}
+	
+	if (!found) {
+		dirblk = make_link_block(dirf, nblk);
+	} 
+
+	return dirblk;
 }
 
 // Write file to disk under specified dir.

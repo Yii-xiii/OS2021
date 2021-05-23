@@ -191,12 +191,23 @@ read(int fdnum, void *buf, u_int n)
 
 	// Similar to 'write' function.
 	// Step 1: Get fd and dev.
+	r = fd_lookup(fdnum, &fd);
+	if (r) return r;
+	
+	r  = dev_lookup(fd->fd_dev_id, &dev);
+	if (r) return r;
 
 	// Step 2: Check open mode.
+	if (fd->fd_omode & O_ACCMODE == O_WRONLY) {
+		return -E_INVAL;
+	}
 
 	// Step 3: Read starting from seek position.
+	r = (*dev->dev_read)(fd, buf, n, fd->fd_offset);
 
 	// Step 4: Update seek position and set '\0' at the end of buf.
+	fd->fd_offset += r;
+	((char *)buf)[r] = '\0';
 
 	return r;
 }
