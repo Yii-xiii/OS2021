@@ -215,6 +215,9 @@ free_block(u_int blockno)
 	if (blockno == 0) {
 		user_panic("bitmap[0] cannot be free!");
 	}
+	if (blockno >= super->s_nblocks) {
+		user_panic("blockno too big");
+	}
 
 	// Step 2: Update the flag bit in bitmap.
 	// you can use bit operation to update flags, such as  a |= (1 << n) .

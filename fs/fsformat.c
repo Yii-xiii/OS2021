@@ -205,7 +205,7 @@ int make_link_block(struct File *dirf, int nblk) {
 //      use make_link_block function
 struct File *create_file(struct File *dirf) {
     struct File *dirblk;
-    int i, bno, found;
+    int i, j, bno, found;
     int nblk = dirf->f_size / BY2BLK;
     
     // Your code here
@@ -217,10 +217,11 @@ struct File *create_file(struct File *dirf) {
 		bno = dirf->f_direct[i];
 		dirblk = (struct File *) &(disk[bno].data);
 		
-		for (int j = 0; j < FILE2BLK; j++) {
+		for (j = 0; j < FILE2BLK; j++) {
 			if ((&dirblk[j])->f_name[0]=='\0') {
 				found = 1;
-				break;
+				//break;
+				return &dirblk[j];
 			}
 		}
 	}
@@ -230,17 +231,19 @@ struct File *create_file(struct File *dirf) {
 			bno = ((int *) (disk[dirf->f_indirect].data))[i];
 			dirblk = (struct File *) &(disk[bno].data);
 
-			for (int j = 0; j < FILE2BLK; j++) {
+			for (j = 0; j < FILE2BLK; j++) {
 				if ((&dirblk[j])->f_name[0]=='\0') {
 					found = 1;
-					break;
+					//break;
+					return &dirblk[j];
 				}
 			}
 		}
 	}
 	
 	if (!found) {
-		dirblk = make_link_block(dirf, nblk);
+		bno = make_link_block(dirf, nblk);
+		dirblk = &disk[bno].data;
 	} 
 
 	return dirblk;

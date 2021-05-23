@@ -47,7 +47,7 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
             // Your code here
             // error occurred, then panic.
 		temp = offset_begin + offset;
-		if (syscall_write_dev(temp, disk_offset, sizeof(temp)) < 0) {
+		if (syscall_write_dev(&temp, disk_offset, sizeof(temp)) < 0) {
 			user_panic("write offset addr error!");
 		}
 		if (syscall_write_dev(&diskno, disk_diskno, sizeof(diskno)) < 0) {
@@ -59,11 +59,11 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 		if (syscall_read_dev(&flag, disk_return, sizeof(flag)) < 0 || !flag) {
 			user_panic("operation error!");
 		}
-		if (syscall_read_dev(dst + offset, disk_buffer, 0x200) < 0) {
+		if (syscall_read_dev(dst + offset, disk_buffer,BY2SECT) < 0) {
 			user_panic("reading data error!");
 		} 
 		
-		offset += 0x200;
+		offset += BY2SECT;
 	}
 
 }
@@ -121,13 +121,13 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
             // Your code here
             // error occurred, then panic.
 		temp = offset_begin + offset;
-		if (syscall_write_dev(temp, disk_offset, sizeof(temp)) < 0) {
+		if (syscall_write_dev(&temp, disk_offset, sizeof(temp)) < 0) {
 			user_panic("write offset addr error!");
 		}
 		if (syscall_write_dev(&diskno, disk_diskno, sizeof(diskno)) < 0) {
 			user_panic("write diskno error!");
 		}
-		if (syscall_write_dev(src + offset, disk_buffer, 0x200) < 0) {
+		if (syscall_write_dev(src + offset, disk_buffer, BY2SECT) < 0) {
 			user_panic("writing data error!");
 		} 
 		if (syscall_write_dev(&write, disk_opnum, sizeof(write)) < 0) {
@@ -137,7 +137,7 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 			user_panic("operation error!");
 		}
 		
-		offset += 0x200;
+		offset += BY2SECT;
 	}
 }
 
