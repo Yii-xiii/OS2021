@@ -15,8 +15,8 @@ int block_is_free(u_int);
 u_int
 diskaddr(u_int blockno)
 {
-	if (!super || super->s_nblocks <= blockno) {
-		user_panic("invalid blocbkno");
+	if (super && super->s_nblocks <= blockno) {
+		user_panic("invalid blockno");
 	}
 	
 	return DISKMAP + blockno * BY2BLK;
@@ -566,7 +566,7 @@ dir_lookup(struct File *dir, char *name, struct File **file)
 			if (strcmp((&f[j])->f_name, name) == 0) {
 				*file = &f[j];			
 				(&f[j])->f_dir = dir;
-				break;
+				return 0;
 			}
 		}
 	}
