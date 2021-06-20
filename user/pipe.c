@@ -132,7 +132,6 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
 	
 	p = (struct Pipe *) fd2data(fd);
 	while (_pipeisclosed(fd,p) == 0 && p->p_wpos <= p->p_rpos) {
-writef("read yield\n");
 		syscall_yield();
 	}
 
@@ -167,9 +166,7 @@ pipewrite(struct Fd *fd, const void *vbuf, u_int n, u_int offset)
 	i = 0;
 	wbuf = (char *) vbuf;
 	while (i < n && (_pipeisclosed(fd,p) == 0 || p->p_wpos - p->p_rpos < BY2PIPE)) {
-writef("n = %d, i = %d, wpos = %d, rpos = %d, BY2PIPE = %d\n", n, i, p->p_wpos, p->p_rpos, BY2PIPE);
 		while (_pipeisclosed(fd,p) == 0 && p->p_wpos - p->p_rpos >= BY2PIPE) {
-writef("write yield\n");
 			syscall_yield();
 		}
  		if (p->p_wpos - p->p_rpos < BY2PIPE) {
