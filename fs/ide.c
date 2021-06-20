@@ -57,7 +57,7 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 			user_panic("write op error!");
 		}
 		if (syscall_read_dev(&flag, disk_return, sizeof(flag)) < 0 || !flag) {
-			user_panic("operation error!");
+			user_panic("operation error! : %s",flag ? "DISK READ SUCCESSFUL" : "DISK READ FAILED");
 		}
 		if (syscall_read_dev(dst + offset, disk_buffer,BY2SECT) < 0) {
 			user_panic("reading data error!");

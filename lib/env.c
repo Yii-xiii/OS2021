@@ -536,3 +536,18 @@ void env_check()
         printf("pe2`s sp register %x\n",pe2->env_tf.regs[29]);
         printf("env_check() succeeded!\n");
 }
+
+int env_load_icode(u_int envid, u_char *binary, u_int size) 
+{
+        int r;
+        struct Env *e;  
+
+        r = envid2env(envid, &e, 0);
+        if (r < 0) {
+                return r;
+        }
+
+        u_long entry_point;
+        return load_elf(binary, size, &entry_point, e, load_icode_mapper);
+}
+

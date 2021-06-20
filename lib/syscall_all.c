@@ -517,3 +517,8 @@ int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 	bcopy(dev + 0xa0000000, va, len);
 	return 0;
 }
+
+int sys_load_icode(int sysno, u_int envid, u_char *binary, u_int size) 
+{
+	return env_load_icode(envid, binary, size);
+}

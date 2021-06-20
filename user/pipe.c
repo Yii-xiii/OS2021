@@ -85,9 +85,18 @@ _pipeisclosed(struct Fd *fd, struct Pipe *p)
 	// everybody left is what fd is.  So the other end of
 	// the pipe is closed.
 	int pfd,pfp,runs;
+	runs = -1;
+
+	while (runs != env->env_runs) {
+		runs = env->env_runs;
+		pfd = pageref(fd);
+		pfp = pageref(p);	
+	}
 	
-
-
+	if (pfd == pfp) {
+		return 1;
+	}
+	return 0;
 
 	user_panic("_pipeisclosed not implemented");
 //	return 0;
@@ -121,8 +130,20 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
 	struct Pipe *p;
 	char *rbuf;
 	
+	p = (struct Pipe *) fd2data(fd);
+	while (_pipeisclosed(fd,p) == 0 && p->p_wpos <= p->p_rpos) {
+writef("read yield\n");
+		syscall_yield();
+	}
 
-
+	i = 0;
+	rbuf = (char *) vbuf;
+	while (p->p_rpos < p->p_wpos && i < n) {
+		rbuf[i++] = p->p_buf[(p->p_rpos++) % BY2PIPE];
+	}
+	
+	return i;
+	
 	user_panic("piperead not implemented");
 //	return -E_INVAL;
 }
@@ -141,6 +162,24 @@ pipewrite(struct Fd *fd, const void *vbuf, u_int n, u_int offset)
 	struct Pipe *p;
 	char *wbuf;
 	
+	p = (struct Pipe *) fd2data(fd);
+	
+	i = 0;
+	wbuf = (char *) vbuf;
+	while (i < n && (_pipeisclosed(fd,p) == 0 || p->p_wpos - p->p_rpos < BY2PIPE)) {
+writef("n = %d, i = %d, wpos = %d, rpos = %d, BY2PIPE = %d\n", n, i, p->p_wpos, p->p_rpos, BY2PIPE);
+		while (_pipeisclosed(fd,p) == 0 && p->p_wpos - p->p_rpos >= BY2PIPE) {
+writef("write yield\n");
+			syscall_yield();
+		}
+ 		if (p->p_wpos - p->p_rpos < BY2PIPE) {
+			p->p_buf[(p->p_wpos++) % BY2PIPE] = wbuf[i++];
+		}
+	}
+	
+	if (i < n) return 0;
+	
+	return i;
 
 //	return -E_INVAL;
 	
@@ -162,7 +201,9 @@ pipestat(struct Fd *fd, struct Stat *stat)
 static int
 pipeclose(struct Fd *fd)
 {
-	syscall_mem_unmap(0, fd2data(fd));
+	u_int va = fd2data(fd);
+	syscall_mem_unmap(0, fd);
+	syscall_mem_unmap(0, va);
 	return 0;
 }
 

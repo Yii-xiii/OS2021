@@ -8,7 +8,7 @@ umain(void)
 
 	writef("icode: open /motd\n");
 	if ((fd = open("/motd", O_RDONLY)) < 0)
-		user_panic("icode: open /motd: %e", fd);
+		user_panic("PANIC : icode: open /motd: %e", fd);
 
 	writef("icode: read /motd\n");
 	while ((n = read(fd, buf, sizeof buf-1)) > 0){
